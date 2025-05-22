@@ -11,7 +11,7 @@ from rich import print
 import time
 import joblib  # For saving and loading models efficiently
 import random
-
+import csv
 from BidRequest import BidRequest
 from Bidder import Bidder
 
@@ -127,6 +127,7 @@ class Bid(Bidder):
             3476: 10
         }
 
+    # feature engineering
     def _preprocess_bid_request_ctr(self, bidRequest: BidRequest) -> pd.DataFrame:
         """Preprocesses a single bid request into a DataFrame for CTR model."""
         bid_request_data = {
@@ -216,9 +217,9 @@ class Bid(Bidder):
             bidPrice = max(bidPrice, floor_price)
 
             if bidPrice <= 0: # Avoid bidding 0 or negative price
-                bidPrice = -1
+                bidPrice = -1 # bid not being placed
             elif bidPrice > 300: # Cap bid price to avoid excessively high bids (example cap)
-                bidPrice = 300
+                bidPrice = 300 # $/CPM
 
         return bidPrice
 
@@ -226,7 +227,7 @@ class Bid(Bidder):
         """
         Processes a single bid request and measures execution time.
         """
-        bid_request = BidRequest()
+        bid_request = BidRequest() # instantiate
 
         bid_request.setBidId(bid_data[0])
         
@@ -266,10 +267,13 @@ class Bid(Bidder):
         execution_time = (end_time - start_time) * 1000  # Convert to milliseconds
 
         # Debugging print
-        print(f"Processed bid request with ID: {bid_data[0]}, Execution Time: {execution_time:.4f} ms, at ${bid_price}/CPM ")
+        print(f"Processed bid request with ID: {bid_data[0]}, from {bid_request.advertiserId} Execution Time: {execution_time:.4f} ms, at ${bid_price}/CPM ")
+
+        with open("./output.txt", 'a') as f:
+            writer = csv.writer(f)
+            writer.writerow([timestamp_str, bid_data[0], bid_request.advertiserId, execution_time, bid_price])
 
         return execution_time, 1 if bid_price != -1 else 0, 1 if bid_price == -1 else 0
-
 
     def test_bidding_framework(self, bid_dataframe, no_of_rows):
         """ Tests the Bid class with bid requests and measures execution time.  """
@@ -295,6 +299,9 @@ class Bid(Bidder):
         print(f"Number of No Bids: {no_bid_count}")
         print(f"Average Execution Time per Bid Request: {avg_execution_time:.4f} ms")
 
+
+# runner code 
 test_df = pd.read_csv(r"C:\Adobe Devcraft Submission - Jab We Mech\dataset\bid.07.txt", sep = '\t', header=None, na_values=["null"])
 test_bid = Bid()
-test_bid.test_bidding_framework(test_df, 10)
+test_df.info()
+test_bid.test_bidding_framework(test_df, 1000)
