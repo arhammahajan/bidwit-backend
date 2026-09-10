@@ -1,5 +1,35 @@
+# Datasets and archives
 dataset/
 dataset.7z
+*.zip
+*.tar.gz
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE and OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+
+# Hackathon / competition artifacts
 documentation.md
 adobe devfest.pdf
-bidder.submission.code/python/__pycache__/
